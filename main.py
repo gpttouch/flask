@@ -9,8 +9,11 @@ app.app_context().push()
 DROPBOX_TOKEN = os.getenv("DROPBOX_TOKEN")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 
+if not DROPBOX_TOKEN or not OPENAI_KEY:
+    raise Exception("DROPBOX_TOKEN e OPENAI_KEY precisam estar definidos nas variáveis de ambiente.")
+
 dbx = dropbox.Dropbox(DROPBOX_TOKEN)
-openai.api_key = OPENAI_KEY
+client = OpenAI(api_key=OPENAI_KEY)
 
 @app.route("/ler-arquivo", methods=["POST"])
 def ler_arquivo():
@@ -25,17 +28,18 @@ def ler_arquivo():
         metadata, response = dbx.files_download(caminho_arquivo)
         conteudo = response.content.decode("utf-8", errors="ignore")
 
-        client = openai.OpenAI()
-resposta = client.chat.completions.create(
-  model="gpt-4-1106-preview",
-  messages=[...]
-)
+        resposta = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
                 {"role": "system", "content": "Você é um assistente de consultoria de marketing."},
-                {"role": "user", "content": f"Conteúdo do arquivo:\n{conteudo}\n\nPergunta: {pergunta}"}
+                {"role": "user", "content": f"Conteúdo do arquivo:\n\n{conteudo}\n\nPergunta: {pergunta}"}
             ]
         )
 
-        return jsonify({"resposta": resposta['choices'][0]['message']['content']})
+        return jsonify({"resposta": resposta.choices[0].message.content})
+
+    except dropbox.exceptions.ApiError as e:
+        return jsonify({"erro": f"Erro Dropbox: {str(e)}"}), 500
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
