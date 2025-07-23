@@ -29,7 +29,7 @@ def ler_arquivo():
         conteudo = response.content.decode("utf-8", errors="ignore")
 
         resposta = client.chat.completions.create(
-            model="gpt-4",
+           model="gpt-4-1106-preview",
             messages=[
                 {"role": "system", "content": "Você é um assistente de consultoria de marketing."},
                 {"role": "user", "content": f"Conteúdo do arquivo:\n\n{conteudo}\n\nPergunta: {pergunta}"}
