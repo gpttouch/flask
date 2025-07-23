@@ -1,4 +1,4 @@
 flask
-dropbox
-openai
 gunicorn
+dropbox
+openai>=1.0.0
