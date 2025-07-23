@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import dropbox
-import openai
+from openai import OpenAI
 import os
 
 app = Flask(__name__)
@@ -25,9 +25,11 @@ def ler_arquivo():
         metadata, response = dbx.files_download(caminho_arquivo)
         conteudo = response.content.decode("utf-8", errors="ignore")
 
-        resposta = openai.ChatCompletion.create(
-            model="gpt-4-1106-preview",
-            messages=[
+        client = openai.OpenAI()
+resposta = client.chat.completions.create(
+  model="gpt-4-1106-preview",
+  messages=[...]
+)
                 {"role": "system", "content": "Você é um assistente de consultoria de marketing."},
                 {"role": "user", "content": f"Conteúdo do arquivo:\n{conteudo}\n\nPergunta: {pergunta}"}
             ]
